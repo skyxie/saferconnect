@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<style type="text/css">
+  html { height: 100% }
+  body { height: 100%; margin: 0; padding: 0 }
+  
+  h1 {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+  }
+
+  a {
+    text-decoration:  none;
+  }
+
+  .left_notch {
+    position: absolute;
+    top: 15px;
+    left: -8px;
+    border-right: 10px solid #fff;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 0;
+  }
+
+  .border_left_notch {
+    position: absolute;
+    top: 15px;
+    left: -10px;
+    border-right: 10px solid #3cf;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 0;
+  }
+
+  .close_button {
+    position:absolute;
+    top:5px;
+    right:5px;
+  }
+
+  #search_box {
+    position:absolute;
+    z-index:1;
+    bottom:10%;
+    right:5%;
+    width:30%;
+    height:60px;
+    padding:20px;
+    background-color:#fff;
+    border-radius:10px;
+    border-style:solid;
+    border-width:1px;
+    border-color:#3cf;
+  }
+  
+  #search_text {
+    height:16px;
+    width:80%;
+  }
+
+  #search_button {
+    position : relative;
+    top : 12px;
+  }
+
+  #venue {
+    z-index:1;
+    position:absolute;
+    display:none;
+    width:400px;
+    max-height:90%;
+    top:10px;
+    left:6%;
+    background-color:#fff;
+    border-radius:10px;
+    border-style:solid;
+    border-width:1px;
+    border-color:#3cf;
+  }
+
+  /* style for button to show venue image thumbnails */
+  #venue_images {
+    position: absolute;
+    top: 35px;
+    right: 5px;
+  }
+
+  #venue_header {
+    padding-left:10px;
+    padding-right:20px;
+    padding-bottom:10px;
+  }
+  span.venue_stat {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  #venue_tips {
+    width:100%;
+    margin-bottom:15px;
+    overflow:auto;
+  }
+  div.tip {
+    float:left;
+  }
+  div.tip_thin {
+    width:130px;
+    height:100%;
+  }
+  div.tip_wide {
+    width:250px;
+  }
+  div.tip_short {
+    height:20px;
+  }
+
+  /* Highlight Boxes */
+
+  #venue_thumbnails_container {
+    z-index:3;
+    display:none;
+  }
+
+  #venue_thumbnails {
+    padding:25px;
+  }
+
+  #highlight_container {
+    z-index:4;
+    display:none;
+  }
+
+  #highlight_image {
+    position:absolute;
+    left:50%;
+    top:50%;
+    -moz-box-shadow: 0 0 5px 5px #888;
+    -webkit-box-shadow: 0 0 5px 5px#888;
+    box-shadow: 0 0 5px 5px #888;    
+  }
+
+  div.tile {
+    float:left;
+  }
+
+  div.loading {
+    background-image:url(public/images/ajaxRequest.gif);
+    background-repeat:no-repeat;
+    background-position:center center;
+  }
+
+  div.highlight_shadow {
+    position: absolute;
+    overflow:auto;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+</style>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="http://stevenlevithan.com/assets/misc/date.format.js"></script>
+<script src="http://maps.googleapis.com/maps/api/js?v=3.4&sensor=true&key=ABQIAAAAh4IY8tN7gDAycNrpuVe6IBTs-SSnqJHOuea_AzdSjMvvV8n1wxQ45ZxvHARdslozz6AvvfvpM21qXQ" type="text/javascript"></script>
+<script type="text/javascript">
+
+  var auth_token_field = location.hash.split('=',2)[1];
+
+  function initialize() {
+
+    var instagram_client_id = "501ac1ddaa8743e1b9e6b90dc8b2454d"
+
+    // Default starting location in Central Park
+    var centralPark = new google.maps.LatLng(40.783333, -73.96666) 
+    var defaultZoom = 16;
+
+    var map = new google.maps.Map(
+      document.getElementById("map_canvas"),
+      {
+        center: centralPark,
+        zoom: 16,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      }
+    );
+
+    function handleNoGeolocation(message) {
+      if(message) { 
+        alert("Oops, we couldn't find you!"); 
+      }
+      map.setCenter(centralPark, defaultZoom);
+    }
+
+    // Try HTML5 geolocation
+    if(navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        centerPoint = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+        map.setCenter(centerPoint, defaultZoom);
+      }, function() {
+        handleNoGeolocation(true);
+      });
+    } else {
+      handleNoGeolocation(false);
+    }
+    
+    // We need this specific format for this date
+    var date_str = (new Date()).format("yyyymmdd")
+
+    // Hash of 4sq venue objects
+    var venues = new Object();
+
+    // Hash of all Google Map markers
+    var markers = new Object();
+
+    // Build the url for a venue icon image
+    var getMarkerOptions = function(venue) {
+      var opts = {
+        map : map,
+        title : venue.name,
+        animation : google.maps.Animation.DROP,
+        position : new google.maps.LatLng(venue.location.lat, venue.location.lng)
+      }
+      if(typeof(venue.categories[0]) != "undefined") {
+        var icon = venue.categories[0].icon;
+        opts['icon'] = icon.prefix + icon.sizes[0] + icon.name;
+      }
+      return opts
+    }
+
+    // Adds venue to hash of venues and creates venue marker
+    var addVenue = function(venue) {
+      if (!venues.hasOwnProperty(venue.id)) {
+        venues[venue.id] = venue;
+      }
+      if (markers.hasOwnProperty(venue.id)) {
+        markers[venue.id].setMap(map);
+      } else {
+        var marker = new google.maps.Marker(getMarkerOptions(venue));
+        markers[venue.id] = marker;
+        google.maps.event.addListener(marker, 'click', function() { showVenue(venue.id); });
+      }
+    }
+
+    // Highlight an image
+    //
+    // Make a single image standout from the page by masking the page in shadow 
+    // and highlighting a full-sized image in the center
+    var highlightImage = function(url, width, height) {
+      $("#highlight_image").empty().css("width", width).css("height", height).css("margin-left", (width/-2)).css("margin-top", (height/-2)).append("<img src='" + url + "'>");
+      $("#highlight_container").show();
+    }
+
+    // Add Foursquare image to the collage of thumbnails
+    // and set up event hook for image highlight
+    var addFoursquareImage = function(image) {
+      var thumb_elem = $("<div class='loading tile'><img src='" + image.sizes.items[2].url + "' /></div>");
+      thumb_elem.height(image.sizes.items[2].height);
+      thumb_elem.width(image.sizes.items[2].width);
+      thumb_elem.click(function() { highlightImage(image.url, image.sizes.items[0].width, image.sizes.items[0].height); });
+      $("#venue_thumbnails").append(thumb_elem);
+    }
+
+    // Get all photos for a venue
+    var getVenueImages = function(venue_id) {
+      $.ajax({
+        url : "https://api.foursquare.com/v2/venues/" + venue_id + "/photos",
+        data : {
+          group       : "venue",
+          oauth_token : auth_token_field,
+          v           : date_str
+        },
+        success : function(data) {
+          $.each(data.response.photos.items, function(index, value) { addFoursquareImage(value); });
+        }
+      });
+    }
+
+    // Add Instagram thumbnail to collage of thumbnails and create event hook for image highlight
+    var addInstagramImage = function(image) {
+      var thumb_elem = $("<div class='loading tile'><img src='" + image.images.thumbnail.url + "'></div>");
+      thumb_elem.height(image.images.thumbnail.height);
+      thumb_elem.width(image.images.thumbnail.width);
+      thumb_elem.click(function() {
+        highlightImage(image.images.standard_resolution.url,
+                       image.images.standard_resolution.width,
+                       image.images.standard_resolution.height); 
+      });
+      $("#venue_thumbnails").append(thumb_elem);
+    }
+
+    // Load instagram images from a specific instagram location ID
+    var getInstagramPhotos = function(instagram_id) {
+      $.ajax({
+        type : "GET",
+        dataType : "jsonp",
+        url  : "https://api.instagram.com/v1/locations/" + instagram_id + "/media/recent",
+        data : { client_id : instagram_client_id },
+        headers : { 'Access-Control-Allow-Origin' : "*" },
+        success : function(result) {
+          $.each(result.data, function(index, image) { addInstagramImage(image); });
+        }
+      });
+    }
+
+    // Use the Foursquare venue ID to find an Instagram location 
+    // and then load images from that Instagram location
+    var getInstagramPhotosViaFoursquare = function(foursquare_id) {
+      $.ajax({
+        type : "GET",
+        dataType : "jsonp",
+        url  : "https://api.instagram.com/v1/locations/search",
+        data : {  
+          client_id        : instagram_client_id,
+          foursquare_v2_id : foursquare_id
+        },
+        headers : { 'Access-Control-Allow-Origin' : "*" },
+        success : function(result) { 
+          if (result && result.data.length > 0) {
+            getInstagramPhotos(result.data[0].id);
+          }
+        }
+      });
+    }
+
+    // Get all the tips for a venue
+    var getVenueTips = function(venue_id) {
+      $.ajax({
+        url : "https://api.foursquare.com/v2/venues/" + venue_id + "/tips",
+        data : {
+          group       : "venue",
+          oauth_token : auth_token_field,
+          v           : date_str
+        },
+        success : function(data) {
+          $.each(
+            data.response.tips.items.sort(function(a, b) { return b.done.count - a.done.count }),
+            function(index, tip) {
+              $("#venue_tips").append(
+                "<div class='tip padded'>" + 
+                  "<div class='tip tip_thin'><img src='" + tip.user.photo + "'></div>" +
+                  "<div class='tip tip_wide'>" +
+                    "<div class='tip_short'><b>" + 
+                      (typeof(tip.user.firstName) != "undefined" ? tip.user.firstName + " " : "") + 
+                      (typeof(tip.user.lastName) != "undefined" ? tip.user.lastName : "" ) + 
+                    "</b></div>" +
+                    "<div>" + tip.text + "</div>" +
+                    "<div class='tip_short'><b>Done</b>: " + tip.done.count + "</div>" +
+                  "</div>" +
+                "</div>"
+              );
+            }
+          );
+        }
+      });
+    }
+
+    var showVenue = function(venue_id) {
+      map.setCenter(markers[venue_id].getPosition());
+      venue = venues[venue_id];
+      $("#venue_thumbnails").empty();
+      $("#venue_tips").empty();
+      $("#venue_name").empty().append(
+        "<h1>" + "<a href='https://foursquare.com/v/" + venue.id + "'>" + venue.name + "</a>" + "</h1>");
+      $("#venue_stats").empty().append(
+        "<span class='venue_stat'>Checkins: " + venue.stats.checkinsCount + "</span>" + 
+        "<span class='venue_stat'>Tips: " + venue.stats.tipCount + "</span>" + 
+        "<span class='venue_stat'>Users: " + venue.stats.usersCount + "</span>");
+      getVenueTips(venue_id);
+      $("#venue").show();
+      adjustDimensions();
+
+      getVenueImages(venue_id);
+      getInstagramPhotosViaFoursquare(venue_id);
+    }
+
+    // Get all venues near a given latitude and longitude
+    var getNearbyVenues = function(query) {
+      var center = map.getCenter(),
+          bounds = map.getBounds(),
+          ne = bounds.getNorthEast(),
+          sw = bounds.getSouthWest();
+      $.ajax({
+        url : "https://api.foursquare.com/v2/venues/search",
+        data : {
+          ll          : center.lat() + "," + center.lng(),
+          ne          : ne.lat() + "," + ne.lng(),
+          sw          : sw.lat() + "," + sw.lng(),
+          query       : query,
+          oauth_token : auth_token_field,
+          v           : date_str
+        },
+        success : function(data) {
+          // Destroy any existing markers
+          $.each(markers, function(key, value) { value.setMap(null); });
+          $.each(data.response.venues, function(index, value) { addVenue(value); });
+        }
+      });
+    }
+
+    // Set up search event hook
+    $("#search_form").submit(function () {
+      getNearbyVenues($("#search_text").val());
+      return false;
+    });
+    
+    $(".highlight_shadow").click(function(evt) {
+      if ($(evt.srcElement).hasClass("highlight_shadow")) {
+        $(evt.srcElement).hide();
+      }
+    });
+
+    // An ugly, terrible hack - adjust the max-height of the venue tips container when the window size is adjusted
+    var adjustDimensions = function() {
+      if ($("#venue").is(":visible")) {
+        $("#venue_tips").css("max-height", $(window).height() * 0.90 - $("#venue_header").height() - 20);
+      }
+    }
+
+    $(window).resize(adjustDimensions);
+
+    $("#venue_images").click(function(evt) {
+      $("#venue_thumbnails_container").show();
+    });
+
+    $(".close_button").click(function(evt) { 
+      $(evt.srcElement.parentElement).hide();
+    });
+
+  }
+
+</script>
+</head>
+<body onload="initialize()">
+
+  <div id="map_canvas" style="height: 100%; width: 100%;"></div>
+
+  <form id="search_form">
+    <div id="search_box" >
+      Hello, what are you looking for?
+      <br /><input id="search_text" name="search_text_field" type="text" />
+      <input id="search_button" type="image" src="public/images/search.png" />
+    </div>
+  </form>
+
+  <div id="venue">
+    <img class="close_button" src="public/images/close.gif">
+    <div id="venue_header">
+      <div id="venue_name"></div>
+      <div id="venue_stats"></div>
+      <img id="venue_images" src="public/images/camera.jpg">
+    </div>
+    <div id="venue_tips"></div>
+  </div>
+
+  <div id="venue_thumbnails_container" class="highlight_shadow">
+    <div id="venue_thumbnails" class="highlight_box">
+    </div>
+  </div>
+
+  <div id="highlight_container" class="highlight_shadow">
+    <div id="highlight_image" class="highlight_box loading"></div>
+  </div>
+</body>
+</html>
