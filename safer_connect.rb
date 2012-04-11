@@ -5,7 +5,7 @@ class SaferConnect < Sinatra::Base
   set :root, File.dirname(__FILE__)
 
   get '/' do
-    "Hello World"
+    erb :index
   end
 
 end
