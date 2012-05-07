@@ -22,7 +22,7 @@ module FoursquareConnect
         }.inject([]) { |list,pair| list + [pair.join("=")] }.join("&")
         logger.debug "Sending request params #{request_params}"
 
-        uri = URI.parse("#{Foursquare::ACCESS_TOKEN_URI}?#{request_params}")
+        uri = URI.parse("#{ACCESS_TOKEN_URI}?#{request_params}")
 
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
