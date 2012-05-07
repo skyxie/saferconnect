@@ -1,19 +1,17 @@
 class SaferConnect < Sinatra::Base
 
-  configure :development do
-    enable :sessions
-  end
-
+  enable :sessions
   enable :logging
   set :root, File.dirname(__FILE__)
   set :session_secret, ENV['SESSION_KEY'] ||= 'skyxie_super_secret'
 
-  use Rack::Session::Cookie
   use Rack::Logger, Logger::DEBUG
 
   helpers InstagramConnect::Helpers, FoursquareConnect::Helpers, Helpers
 
   get '/' do
+    session[:test] = "Testing"
+    logger.debug session[:test]
     erb :index
   end
 
