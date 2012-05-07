@@ -40,8 +40,8 @@ module FoursquareConnect
     end
 
     def foursquare_access_token=(token)
-      logger.debug "Setting Foursquare access token to: #{token}"
       session[:foursquare_access_token] = token
+      logger.debug "Setting Foursquare access token to: #{session[:foursquare_access_token]}"
     end
   end
 end

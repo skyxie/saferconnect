@@ -10,7 +10,8 @@ class SaferConnect < Sinatra::Base
   helpers InstagramConnect::Helpers, FoursquareConnect::Helpers, Helpers
 
   get '/' do
-    session[:test] = "Testing"
+    session[:test] ||= 0
+    session[:test] += 1
     logger.debug session[:test]
     erb :index
   end
