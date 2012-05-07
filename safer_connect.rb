@@ -1,6 +1,10 @@
 class SaferConnect < Sinatra::Base
 
-  enable :sessions, :logging
+  configure :development do
+    enable :sessions
+  end
+
+  enable :logging
   set :root, File.dirname(__FILE__)
   set :session_secret, ENV['SESSION_KEY'] ||= 'skyxie_super_secret'
 
