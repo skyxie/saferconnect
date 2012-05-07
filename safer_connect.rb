@@ -2,7 +2,7 @@ class SaferConnect < Sinatra::Base
 
   enable :sessions, :logging
   set :root, File.dirname(__FILE__)
-  set :session_secret, ENV['SESSION_KEY']
+  set :session_secret, ENV['SESSION_KEY'] ||= 'skyxie_super_secret'
 
   use Rack::Logger, Logger::DEBUG
 
