@@ -1,7 +1,2 @@
-require 'rubygems'
-require 'sinatra'
-require './safer_connect.rb'
-require 'thin'
-
-$stdout.sync = true
+require 'environment.rb'
 run SaferConnect

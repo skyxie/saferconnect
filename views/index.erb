@@ -1,11 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>minipinions</title>
+<style type="text/css">
+
+img.green_check {
+  width: 20px;
+  height: 20px;
+  background: url(/images/green_check_red_cross.jpg) 0 0;
+}
+
+img.red_cross {
+  width: 20px;
+  height: 20px;
+  background: url(/images/green_check_red_cross.jpg) -20px 0;
+}
+
+</style>
+<title>saferconnect</title>
 </head>
 <body>
-<a href="https://foursquare.com/oauth2/authenticate?client_id=TISG2M1FXGO1RZUECP1MNU5RFOICFGYMB1BIUVIRJRH5BANH&response_type=token&redirect_uri=http://saferconnect.heroku.com/login.html">
-<img src="/images/foursquare.png" alt="login with foursquare" />
-</a>
+
+<p>
+  <% if foursquare_access_token %>
+    Connected with Foursquare
+    <img src="/images/foursquare.png" alt="Connected with foursquare"/>
+    <img class=green_check src="/images/trans.png" width=1 height=1>
+  <% else %>
+    Connect your data from Foursquare <a href="<%= foursquare_authorize_url %>">
+      <img src="/images/foursquare.png" alt="Connect to foursquare" />
+    </a>
+  <% end %>
+</p>
+
+<p>
+  <% if instagram_access_token %>
+    Connected with Instagram <img class=green_check src="/images/trans.png" width=1 height=1>
+  <% else %>
+    Connect your data from <a href="<%= instagram_authorize_url %>">Instagram</a>
+  <% end %>
+</p>
+
+<p>
+  Search on our map
+  <a href="/map"><img src="/images/Google-Maps-icon.png"></a>
+</p>
+
 </body>
 </html>

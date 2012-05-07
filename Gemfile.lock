@@ -1,9 +1,27 @@
 GEM
   remote: http://rubygems.org/
   specs:
+    SystemTimer (1.2.3)
+    addressable (2.2.8)
     daemons (1.1.8)
     eventmachine (0.12.10)
+    faraday (0.7.6)
+      addressable (~> 2.2)
+      multipart-post (~> 1.1)
+      rack (~> 1.1)
+    faraday_middleware (0.8.7)
+      faraday (>= 0.7.4, < 0.9)
+    hashie (1.2.0)
+    instagram (0.8.3)
+      faraday (~> 0.7)
+      faraday_middleware (~> 0.8)
+      hashie (>= 0.4.0)
+      multi_json (~> 1.0.3)
+    json (1.6.1)
+    multi_json (1.0.4)
+    multipart-post (1.1.5)
     rack (1.4.1)
+    redis (2.2.2)
     sinatra (1.1.0)
       rack (~> 1.1)
       tilt (~> 1.1)
@@ -17,5 +35,10 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  SystemTimer (= 1.2.3)
+  faraday (= 0.7.6)
+  instagram
+  json
+  redis (= 2.2.2)
   sinatra (= 1.1.0)
   thin
