@@ -10,9 +10,6 @@ class SaferConnect < Sinatra::Base
   helpers InstagramConnect::Helpers, FoursquareConnect::Helpers, Helpers
 
   get '/' do
-    session[:counter] ||= 0
-    session[:counter] += 1
-    logger.debug "Session counter: #{session[:counter]}"
     erb :index
   end
 
