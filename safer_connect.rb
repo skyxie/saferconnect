@@ -4,6 +4,7 @@ class SaferConnect < Sinatra::Base
   set :root, File.dirname(__FILE__)
   set :session_secret, ENV['SESSION_KEY'] ||= 'skyxie_super_secret'
 
+  use Rack::Session::Cookie
   use Rack::Logger, Logger::DEBUG
 
   helpers InstagramConnect::Helpers, FoursquareConnect::Helpers, Helpers
