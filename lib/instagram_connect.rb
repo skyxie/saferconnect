@@ -27,7 +27,7 @@ module InstagramConnect
       token
     end
 
-    def instagram_access_token=(token)
+    def set_instagram_access_token(token)
       session[:instagram_access_token] = token
       logger.debug "Setting Instagram access token to: #{session[:instagram_access_token]}"
     end

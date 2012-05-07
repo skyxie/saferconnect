@@ -19,14 +19,14 @@ class SaferConnect < Sinatra::Base
   get '/foursquare' do
     token = FoursquareConnect.request_access_token(params[:code])
     logger.debug "Received Foursquare access_token : #{token}"
-    foursquare_access_token = token
+    set_foursquare_access_token(token)
     erb :index
   end
 
   get '/instagram' do
     token = InstagramConnect.request_access_token(params[:code])
     logger.debug "Received Instagram access_token : #{token}"
-    instagram_access_token = token
+    set_instagram_access_token(token)
     erb :index
   end
 
