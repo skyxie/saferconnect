@@ -1,2 +1,2 @@
-require 'environment.rb'
+require './environment.rb'
 run SaferConnect
