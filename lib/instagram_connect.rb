@@ -4,6 +4,11 @@ module InstagramConnect
   CLIENT_SECRET = "cc2196720df94ad082af68c929ccc47a"
   REDIRECT_URI = "http://saferconnect.heroku.com/instagram"
 
+  def self.request_access_token(code)
+    resp = Instagram.get_access_token(code, :redirect_uri => REDIRECT_URI)
+    resp.access_token
+  end
+
   module Helpers
     def self.included(base)
       Instagram.configure do |config|
@@ -17,14 +22,13 @@ module InstagramConnect
     end
 
     def instagram_access_token
-      if session[:instagram_access_token].nil? && params[:code]
-        resp = Instagram.get_access_token(params[:code], :redirect_uri => REDIRECT_URI)
-        session[:instagram_access_token] = resp.access_token        
-      end
-      session[:instagram_access_token]
+      token = session[:instagram_access_token]
+      logger.debug "Instagram access token pulled from session: #{token}"
+      token
     end
 
     def instagram_access_token=(token)
+      logger.debug "Setting Instagram access token to: #{token}"
       session[:instagram_access_token] = token
     end
   end
