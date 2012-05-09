@@ -1,0 +1,59 @@
+<html>
+<head>
+<style type="text/css">
+  div.image_block {
+    height : 612px;
+    width : 612px;
+    float : left;
+    padding : 15px;
+  }
+
+  div.meta_block {
+    height : 612px;
+    float : left;
+    padding : 15px;
+  }
+
+  div.user_block, div.caption_block, div.tags_block {
+    padding-bottom: 15px;
+    padding-top: 15px;
+  }
+</style>
+</head>
+
+<body>
+
+<% @user_media_feed.each do |media| %>
+  <div class=media_block>
+    <div class=image_block>
+      <img src="<%= media.images.standard_resolution.url %>">
+    </div>
+    <div class=meta_block>
+      <% if media.caption %>
+        <div class=created_at_block>
+          <b>Created</b> <%= Time.at(media.caption.created_time.to_i) %>
+        </div>
+        <div class=user_block>
+          <div class=user_profile_picture_block>
+            <img src="<%= media.caption.from.profile_picture %>">
+          </div>
+          <div class=user_full_name_block>
+            <b>Full Name</b>: <%= media.caption.from.full_name %>
+          </div>
+          <div class=user_username_block>
+            <b>Username</b>: <a href="/instagram/<%= media.caption.from.id %>/feed"><%= media.caption.from.username %></a>
+          </div>
+        </div>
+        <div class=caption_text_block>
+          <b>Caption:</b> <%= media.caption.text %>
+        </div>
+      <% end %>
+      <div class=tags_block>
+        <b>Tags</b>: <%= media.tags.join(", ") %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+</body>
+</html>

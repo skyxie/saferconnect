@@ -4,20 +4,45 @@ module InstagramConnect
   CLIENT_SECRET = "cc2196720df94ad082af68c929ccc47a"
   REDIRECT_URI = "http://saferconnect.heroku.com/instagram"
 
-  def self.request_access_token(code)
-    resp = Instagram.get_access_token(code, :redirect_uri => REDIRECT_URI)
-    resp.access_token
-  end
-
-  module Helpers
-    def self.included(base)
+  class << self
+    def request_access_token(code)
       Instagram.configure do |config|
         config.client_id = CLIENT_ID
         config.client_secret = CLIENT_SECRET
       end      
+      resp = Instagram.get_access_token(code, :redirect_uri => REDIRECT_URI)
+      resp.access_token
     end
 
+    def user_media_feed(access_token, user_id = nil)
+      Instagram.configure do |config|
+        config.client_id = CLIENT_ID
+        config.access_token = access_token
+      end
+
+      if user_id
+        Instagram.user_recent_media(user_id)
+      else
+        Instagram.user_media_feed
+      end
+    end
+
+    def user(access_token)
+      Instagram.configure do |config|
+        config.client_id = CLIENT_ID
+        config.access_token = access_token
+      end
+
+      Instagram.client.user
+    end
+  end
+
+  module Helpers
     def instagram_authorize_url
+      Instagram.configure do |config|
+        config.client_id = CLIENT_ID
+        config.client_secret = CLIENT_SECRET
+      end      
       Instagram.authorize_url(:redirect_uri => REDIRECT_URI)
     end
 

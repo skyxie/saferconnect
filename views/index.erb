@@ -15,35 +15,113 @@ img.red_cross {
   background: url(/images/green_check_red_cross.jpg) -20px 0;
 }
 
+div.connection_block {
+  padding-bottom : 20px;
+}
+
+div.row {
+  width : 310px;
+  height : 50px;
+  display : block;
+}
+
+div.profile {
+  height : 120px;
+  display : block;
+}
+
+div.profile_key_block {
+  width : 50px;
+  height : 120px;
+  float : left;
+  display : block;
+}
+
+div.profile_line_block {
+  float : left;
+  padding-left : 10px;
+}
+
+div.line_item {
+  font-size : small;
+}
+
+div.key_block {
+  width : 50px;
+  float : left;
+}
+
+div.link_block {
+  float : left;
+  padding-top : 10px;
+  padding-left : 10px;
+}
+
 </style>
 <title>saferconnect</title>
 </head>
 <body>
 
-<p>
-  <% if foursquare_access_token %>
-    Connected with Foursquare
-    <img src="/images/foursquare.png" alt="Connected with foursquare"/>
-    <img class=green_check src="/images/trans.png" width=1 height=1>
-  <% else %>
-    Connect your data from Foursquare <a href="<%= foursquare_authorize_url %>">
-      <img src="/images/foursquare.png" alt="Connect to foursquare" />
-    </a>
-  <% end %>
-</p>
+<div class=connection_block>
+  <div class=row>
+    <div class=key_block>
+      <a href="<%= foursquare_authorize_url %>"><img src="/images/foursquare_icon_36x36.png" height=36 width=36></a>
+    </div>
+    <div class=link_block>
+      <% if foursquare_access_token %>
+        Connected
+      <% else %>
+        Connect?
+      <% end %>
+    </div>
+  </div>
 
-<p>
   <% if instagram_access_token %>
-    Connected with Instagram <img class=green_check src="/images/trans.png" width=1 height=1>
+    <div class=profile>
+      <div class=profile_key_block>
+        <img src="/images/instagram_icon_48x48.png" height=36 width=36>
+        <br /><img src="<%= @instagram_user.profile_picture %>" height=36 width=36>
+      </div>
+      <div class=profile_line_block>
+        <div class=line_item><b>Full Name</b>: <%= @instagram_user.full_name %></div>
+        <div class=line_item><b>Username</b>: <%= @instagram_user.username %></div>
+        <div class=line_item><b>Bio</b>: <%= @instagram_user.bio %></div>
+        <div class=line_item><b>Follows</b>: <%= @instagram_user.counts.follows %></div>
+        <div class=line_item><b>Followed By</b>: <%= @instagram_user.counts.followed_by %></div>
+        <div class=line_item><b>Media</b>: <%= @instagram_user.counts.media %></div>
+      </div>
+    </div>
   <% else %>
-    Connect your data from <a href="<%= instagram_authorize_url %>">Instagram</a>
+    <div class=row>
+      <div class=key_block>
+        <a href="<%= instagram_authorize_url %>"><img src="/images/instagram_icon_48x48.png" height=36 width=36></a>
+      </div>
+      <div class=link_block>
+        Connect?
+      </div>
+    </div>
   <% end %>
-</p>
+</div>
 
-<p>
-  Search on our map
-  <a href="/map"><img src="/images/Google-Maps-icon.png"></a>
-</p>
+<div class=result_block>
+  <div class=row>
+      <div class=key_block>
+        <a href="/map"><img src="/images/google_maps_icon_50x50.png" height=36 width=36></a>
+      </div>
+      <div class=link_block>
+        Search on our map
+      </div>
+  </div>
+
+  <div class=row>
+      <div class=key_block>
+        <a href="/instagram/feed"><img src="/images/instagram_icon_48x48.png" height=36 width=36></a>
+      </div>
+      <div class=link_block>
+        Check out your instagram feed
+      </div>
+  </div> 
+</div>
 
 </body>
 </html>
