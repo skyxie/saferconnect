@@ -20,7 +20,7 @@ class SaferConnect < Sinatra::Base
   get '/foursquare' do
     token = FoursquareConnect.request_access_token(params[:code])
     logger.debug "Received Foursquare access_token : #{token}"
-    $redis.sadd("instagram:tokens", token)
+    $redis.sadd("foursquare:tokens", token)
     set_foursquare_access_token(token)
     redirect '/'
   end
