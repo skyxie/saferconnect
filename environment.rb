@@ -15,7 +15,7 @@ require 'redis'
 
 $stdout.sync = true
 
-REDIS = if ENV['REDISTOGO_URL']
+$redis = if ENV['REDISTOGO_URL']
   redis_uri = URI.parse(ENV['REDISTOGO_URL'])
   Redis.new(:username => redis_uri.user,
             :password => redis_uri.password,
