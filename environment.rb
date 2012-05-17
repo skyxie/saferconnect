@@ -2,6 +2,7 @@ require 'rubygems'
 require 'sinatra'
 require 'thin'
 
+require 'yaml'
 require 'json'
 require 'uri'
 require 'uri/http'
@@ -28,3 +29,11 @@ $redis = if ENV['REDISTOGO_URL']
 else
   Redis.new() # default connection
 end 
+
+SERVICES = if ENV['SERVICES']
+  YAML::load(ENV['SERVICES'])
+elsif ENV['SERVICES_FILE']
+  YAML::load_file(ENV['SERVICES_FILE'])
+else # development default
+  YAML::load_file("./saferconnect_services.yml")
+end

@@ -1,8 +1,8 @@
 module InstagramConnect
   
-  CLIENT_ID = "501ac1ddaa8743e1b9e6b90dc8b2454d"
-  CLIENT_SECRET = "cc2196720df94ad082af68c929ccc47a"
-  REDIRECT_URI = "http://saferconnect.heroku.com/instagram"
+  CLIENT_ID = SERVICES[:instagram][:id]
+  CLIENT_SECRET = SERVICES[:instagram][:secret]
+  REDIRECT_URI = SERVICES[:instagram][:redirect_uri]
 
   class << self
     def request_access_token(code)

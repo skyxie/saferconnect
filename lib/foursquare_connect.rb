@@ -1,8 +1,8 @@
 module FoursquareConnect
 
-  CLIENT_ID = "TISG2M1FXGO1RZUECP1MNU5RFOICFGYMB1BIUVIRJRH5BANH"
-  CLIENT_SECRET = "XPSQ4W3GSWSUW1QW44NYBS550EOVCKV3B0XA4QFB2WMIGI0P"
-  REDIRECT_URI = "http://saferconnect.heroku.com/foursquare"
+  CLIENT_ID = SERVICES[:foursquare][:id]
+  CLIENT_SECRET = SERVICES[:foursquare][:secret]
+  REDIRECT_URI = SERVICES[:foursquare][:redirect_uri]
   ACCESS_TOKEN_URI = "https://foursquare.com/oauth2/access_token"
 
   def self.request_access_token(code)
