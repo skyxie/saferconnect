@@ -13,14 +13,9 @@ require 'instagram'
 
 require 'redis'
 
-require './lib/foursquare_connect.rb'
-require './lib/instagram_connect.rb'
-require './lib/helpers.rb'
-require './safer_connect.rb'
-
 $stdout.sync = true
 
-$redis = if ENV['REDISTOGO_URL']
+REDIS = if ENV['REDISTOGO_URL']
   redis_uri = URI.parse(ENV['REDISTOGO_URL'])
   Redis.new(:username => redis_uri.user,
             :password => redis_uri.password,
@@ -37,3 +32,8 @@ elsif ENV['SERVICES_FILE']
 else # development default
   YAML::load_file("./saferconnect_services.yml")
 end
+
+require './lib/foursquare_connect.rb'
+require './lib/instagram_connect.rb'
+require './lib/helpers.rb'
+require './safer_connect.rb'
