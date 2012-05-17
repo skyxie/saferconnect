@@ -35,5 +35,6 @@ end
 
 require './lib/foursquare_connect.rb'
 require './lib/instagram_connect.rb'
+require './lib/google_connect.rb'
 require './lib/helpers.rb'
 require './safer_connect.rb'
