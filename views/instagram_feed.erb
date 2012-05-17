@@ -1,6 +1,15 @@
 <html>
 <head>
 <style type="text/css">
+  div.search_block {
+    width : 100%;
+    padding-left :15px;
+  }
+
+  div.media_block {
+    width : 100%;
+  }
+
   div.image_block {
     height : 612px;
     width : 612px;
@@ -10,6 +19,7 @@
 
   div.meta_block {
     height : 612px;
+    width : 300px;
     float : left;
     padding : 15px;
   }
@@ -19,12 +29,34 @@
     padding-top: 15px;
   }
 </style>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.js"></script>
+<script type="text/javascript">
+function initialize() {
+  $("#search_filter").change(function(event_obj) {
+    filter = new RegExp($("#search_filter").val(), "mig");
+    $.each($(".media_block"), function(index, value) {
+      if (filter.test($(value).find(".caption_text_block").text()))
+      {
+        $(value).show();
+      }
+      else
+      {
+        $(value).hide();
+      }
+    });
+  });
+}
+</script>
 </head>
 
-<body>
+<body onload="initialize()">
+
+<div class=search_block>
+  <input id=search_filter type=text size=50></input>
+</div>
 
 <% @user_media_feed.each do |media| %>
-  <div class=media_block>
+  <div class=media_block id=<%= media.id %>>
     <div class=image_block>
       <img src="<%= media.images.standard_resolution.url %>">
     </div>
