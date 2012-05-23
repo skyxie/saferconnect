@@ -1,0 +1,30 @@
+<html>
+<head>
+
+<style type="text/css">
+</style>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="http://stevenlevithan.com/assets/misc/date.format.js"></script>
+<script type="text/javascript" src="/javascripts/foursquare_connect.js"></script>
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?v=3.4&sensor=true&key=<%= GoogleConnect::API_KEY %>"></script>
+
+<script type="text/javascript">
+var loc = {};
+var foursquare_access_token = '<%= foursquare_access_token %>'
+var instagram_access_token = '<%= instagram_access_token %>'
+
+function initialize() {
+  navigator.geolocation.getCurrentPosition(
+    function(position) { loc = new google.maps.LatLng(position.coords.latitude, position.coords.longitude); },
+    function() { alert('We could not locate you!'); }
+  );
+}
+</script>
+
+</head>
+
+<body onload="initialize()">
+</body>
+
+</html>

@@ -63,18 +63,32 @@ div.link_block {
 <body>
 
 <div class=connection_block>
-  <div class=row>
-    <div class=key_block>
-      <a href="<%= foursquare_authorize_url %>"><img src="/images/foursquare_icon_36x36.png" height=36 width=36></a>
+  <% if foursquare_access_token %>
+    <div class=profile>
+      <div class=profile_key_block>
+        <img src="/images/foursquare_icon_36x36.png" height=36 width=36>
+        <br /><img src="<%= foursquare_profile["user"]["photo"] %>" height=36 width=36>
+      </div>
+      <div class=profile_line_block>
+        <div class=line_item><b>Name</b>: <%= [foursquare_profile["user"]["firstName"], foursquare_profile["user"]["lastName"]].join(" ") %></div>
+        <div class=line_item><b>Friends</b>: <%= foursquare_profile["user"]["friends"]["count"] %></div>
+        <div class=line_item><b>Tips</b>: <%= foursquare_profile["user"]["tips"]["count"] %></div>
+        <div class=line_item><b>Lists</b>: <%= foursquare_profile["user"]["lists"]["count"] %></div>
+        <div class=line_item><b>Badges</b>: <%= foursquare_profile["user"]["badges"]["count"] %></div>
+        <div class=line_item><b>Mayorships</b>: <%= foursquare_profile["user"]["mayorships"]["count"] %></div>
+        <div class=line_item><b>Checkins</b>: <%= foursquare_profile["user"]["checkins"]["count"] %></div>
+      </div>
     </div>
-    <div class=link_block>
-      <% if foursquare_access_token %>
-        Connected
-      <% else %>
-        Connect?
-      <% end %>
+  <% else %>
+    <div class=row>
+      <div class=key_block>
+        <a href="<%= foursquare_authorize_url %>"><img src="/images/foursquare_icon_36x36.png" height=36 width=36></a>
+      </div>
+      <div class=link_block>
+          Connect?
+      </div>
     </div>
-  </div>
+  <% end %>
 
   <% if instagram_access_token %>
     <div class=profile>
