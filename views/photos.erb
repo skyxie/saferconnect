@@ -2,29 +2,151 @@
 <head>
 
 <style type="text/css">
+
+#search_field {
+  width : 200px;
+  height : 16px;
+}
+
+#search_button {
+  position : relative;
+  top : 12px;
+}
+
+.result_column {
+  width : 500px;
+}
+
+.result_tile {
+  float : left;
+  width : 350px;
+  margin : 10px;
+  -moz-box-shadow: 5px 5px 10px -3px #999;
+  -webkit-box-shadow: 5px 5px 10px -3px #999;
+}
+.result_header_block { width : 340px; margin-bottom : 5px; background-color : black; color : white; padding : 0 5px 5px 5px; }
+.result_body_block { width : 350px; } 
+.result_left_block { width : 100px; padding : 5px; float : left; margin-bottom : 10px;  }
+.result_right_block { width : 230px; padding : 5px; float : left; margin-bottom : 10px; } 
+.result_footer_block { width : 350px; padding : 0 5px 5px 5px; }
+
+.font_settings { font-size : small; }
 </style>
 
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.js"></script>
 <script type="text/javascript" src="http://stevenlevithan.com/assets/misc/date.format.js"></script>
-<script type="text/javascript" src="/javascripts/foursquare_connect.js"></script>
 <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?v=3.4&sensor=true&key=<%= GoogleConnect::API_KEY %>"></script>
+<script type="text/javascript" src="/javascripts/foursquare_connect.js"></script>
+<script type="text/javascript" src="/javascripts/instagram_connect.js"></script>
 
 <script type="text/javascript">
-var loc = {};
+var venues = {};
+var photos = {};
+
+var foursquare_connect = {};
+var instagram_connect = {};
 var foursquare_access_token = '<%= foursquare_access_token %>'
 var instagram_access_token = '<%= instagram_access_token %>'
 
+function addPhoto(index, photo) {
+  photos[photo.id] = photo;
+  $("#result_column_1").prepend($(
+    '<div class=result_tile id=sample>' +
+      '<div class="result_header_block font_settings">' +
+        'Created using ' + photo.filter + ' on ' + 
+        (new Date(parseInt(photo.created_time) * 1000)).format("dddd, mmmm dS, yyyy, h:MM:ss TT") +
+      '</div>' +
+      '<div class="result_body_block font_settings">' +
+          /*
+        '<div class="result_left_block font_settings">' +
+          (photo.hasOwnProperty("caption") && typeof(photo.caption) != null ?
+            photo.caption.text + 
+            '<br />By <a href="/instagram/' + photo.caption.from.id + '/feed">' + photo.caption.username + '</a>' + 
+            '<br /><img src="' + photo.caption.from.profile_picture + '">' : '') +
+        '</div>' +
+        '<div class="result_right_block font_settings">' +
+            */
+          '<a href="' + photo.link + '">' +
+            '<img src="' + photo.images.low_resolution.url + '" height=' + photo.images.low_resolution.height + ' width=' + photo.images.low_resolution.width + '>' +
+          '</a>' +
+      // '</div>' +
+      '</div>' +
+      '<div class="result_footer_block font_settings">' +
+        'Comments, Likes, etc.' +
+      '</div>' +
+    '</div>'));
+}
+
 function initialize() {
   navigator.geolocation.getCurrentPosition(
-    function(position) { loc = new google.maps.LatLng(position.coords.latitude, position.coords.longitude); },
+    function(position) { 
+      var loc = new google.maps.LatLng(position.coords.latitude, position.coords.longitude); 
+
+      foursquare_connect = new FoursquareConnect(foursquare_access_token, loc);
+      instagram_connect = new InstagramConnect(instagram_access_token, loc);
+
+      // Search field listens on change
+      $('#search_form').submit(function () {
+        foursquare_connect.getNearbyVenues({
+          query   : $('#search_field').val(),
+          success : function(data) {
+            $.each(data.response.venues, function(index, venue) {
+              venues[venue.id] = venue;
+              instagram_connect.getVenueViaFoursquare(venue.id, function(instagram_venue) {
+                if (instagram_venue.data.length > 0) {
+                  instagram_connect.getPhotos(instagram_venue.data[0].id, function(results) {
+                    $.each(results.data, addPhoto);
+                  });
+                }
+              });
+            });
+          }
+        });
+
+        return false;
+      });
+
+    },
     function() { alert('We could not locate you!'); }
   );
+
 }
 </script>
 
 </head>
 
 <body onload="initialize()">
+
+<div id=search_box>
+  <form id=search_form>
+    <input id=search_field type=text></input>
+    <input id=search_button type=image src="/images/search.png"></input>
+  </form>
+</div>
+
+<div class=result_column id=result_column_1>
+
+  <div class=result_tile id=sample>
+    <div class="result_header_block font_settings">
+      Created at sometime by someone
+    </div>
+    
+    <div class="result_body_block font_settings">
+      <div class="result_left_block font_settings">
+        Thumbnail
+      </div>
+      <div class="result_right_block font_settings">
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+      </div>
+    </div>
+
+    <div class="result_footer_block font_settings">
+      Comments, Likes, etc.
+    </div>
+  </div>
+
+</div>
+
 </body>
 
 </html>

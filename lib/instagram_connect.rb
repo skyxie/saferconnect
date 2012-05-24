@@ -10,6 +10,7 @@ module InstagramConnect
         config.client_id = CLIENT_ID
         config.client_secret = CLIENT_SECRET
       end      
+
       resp = Instagram.get_access_token(code, :redirect_uri => REDIRECT_URI)
       resp.access_token
     end
@@ -55,6 +56,10 @@ module InstagramConnect
     def set_instagram_access_token(token)
       session[:instagram_access_token] = token
       logger.debug "Setting Instagram access token to: #{session[:instagram_access_token]}"
+    end
+
+    def instagram_user
+      @instagram_user ||= InstagramConnect.user(instagram_access_token)
     end
   end
 

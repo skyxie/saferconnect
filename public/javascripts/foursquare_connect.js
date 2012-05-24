@@ -1,12 +1,9 @@
 
 var FoursquareConnect = function(auth_token, loc) {
 
-  var date_str = (new Date()).format("yyyymmdd"),
-      venues = {}, photos = {},
+  var foursquare_host = "https://api.foursquare.com/v2",
+      date_str = (new Date()).format("yyyymmdd"),
       that = {};
-
-  that.getVenues = function() { return venues; }
-  that.getPhotos = function() { return photos; }
 
   // Get all venues near a given latitude and longitude
   that.getNearbyVenues = function(params) {
@@ -15,10 +12,10 @@ var FoursquareConnect = function(auth_token, loc) {
       return false;
     }
 
-    request_params = {
+    var request_params = {
       query       : params['query'],
       ll          : loc.lat() + "," + loc.lng(),
-      radius      : 100,
+      radius      : 500,
       oauth_token : auth_token,
       v           : date_str
     };
@@ -26,42 +23,61 @@ var FoursquareConnect = function(auth_token, loc) {
     // Merge possible options
     $.each(['ne', 'sw', 'radius'], function(i, k) {
       if (params.hasOwnProperty(k)) {
-        data[k] = params[k];
+        request_params[k] = params[k];
       }
     });
 
-    // Request nearby venues
+    var ajax_params = {
+      url     : foursquare_host + "/venues/search",
+      data    : request_params
+    }
+
+    if (typeof(params['success']) == 'function') { 
+      ajax_params['success'] = params['success']
+    }
+
+    $.ajax(ajax_params);
+    
+    return true;
+  }
+
+  // Get all tips for a venue
+  that.getVenueTips = function(venue_id, callback) {
+    if (typeof(venue_id) != "string" && typeof(callback) != "function")
+    {
+      return false;
+    }
+
+    // Get all venue and checkin photos
     $.ajax({
-      url     : "https://api.foursquare.com/v2/venues/search",
-      data    : request_params,
-      success : function(data, textStatus, jqXHR) { 
-        $.each(data.response.venues, function(index, venue) { venues[venue.id] = venue; });
-      }
+      url : foursquare_host + "/venues/" + venue_id + "/tips",
+      data : {
+        group       : "venue",
+        oauth_token : auth_token,
+        v           : date_str
+      },
+      success : callback
     });
 
     return true;
   }
 
   // Get all photos for a venue
-  that.getVenueImages = function(params) {
-    if (typeof(params) == "undefined" || typeof(params['venue_id']) == "undefined")
+  that.getVenueImages = function(venue_id, callback) {
+    if (typeof(venue_id) != "string" && typeof(callback) != "function")
     {
       return false;
     }
 
     // Get all venue and checkin photos
-    $.each(["venue", "checkin"], function(i, group) {
-      $.ajax({
-        url : "https://api.foursquare.com/v2/venues/" + venue_id + "/photos",
-        data : {
-          group       : group,
-          oauth_token : auth_token,
-          v           : date_str
-        },
-        success : function(data) {
-          $.each(data.response.photos.items, function(i, photo) { photos[photo.id] = photo; });
-        }
-      });
+    $.ajax({
+      url : foursquare + "/venues/" + venue_id + "/photos",
+      data : {
+        group       : "venue",
+        oauth_token : auth_token,
+        v           : date_str
+      },
+      success : callback
     });
 
     return true;

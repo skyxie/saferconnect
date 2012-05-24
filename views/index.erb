@@ -94,15 +94,15 @@ div.link_block {
     <div class=profile>
       <div class=profile_key_block>
         <img src="/images/instagram_icon_48x48.png" height=36 width=36>
-        <br /><img src="<%= @instagram_user.profile_picture %>" height=36 width=36>
+        <br /><img src="<%= instagram_user.profile_picture %>" height=36 width=36>
       </div>
       <div class=profile_line_block>
-        <div class=line_item><b>Full Name</b>: <%= @instagram_user.full_name %></div>
-        <div class=line_item><b>Username</b>: <%= @instagram_user.username %></div>
-        <div class=line_item><b>Bio</b>: <%= @instagram_user.bio %></div>
-        <div class=line_item><b>Follows</b>: <%= @instagram_user.counts.follows %></div>
-        <div class=line_item><b>Followed By</b>: <%= @instagram_user.counts.followed_by %></div>
-        <div class=line_item><b>Media</b>: <%= @instagram_user.counts.media %></div>
+        <div class=line_item><b>Name</b>: <%= instagram_user.full_name %></div>
+        <div class=line_item><b>Username</b>: <%= instagram_user.username %></div>
+        <div class=line_item><b>Bio</b>: <%= instagram_user.bio %></div>
+        <div class=line_item><b>Follows</b>: <%= instagram_user.counts.follows %></div>
+        <div class=line_item><b>Followed By</b>: <%= instagram_user.counts.followed_by %></div>
+        <div class=line_item><b>Media</b>: <%= instagram_user.counts.media %></div>
       </div>
     </div>
   <% else %>
@@ -120,10 +120,19 @@ div.link_block {
 <div class=result_block>
   <div class=row>
       <div class=key_block>
+        <a href="/photos"><img src="/images/search_36x36.jpg" height=36 width=36></a>
+      </div>
+      <div class=link_block>
+        Search for stuff
+      </div>
+  </div>
+
+  <div class=row>
+      <div class=key_block>
         <a href="/map"><img src="/images/google_maps_icon_50x50.png" height=36 width=36></a>
       </div>
       <div class=link_block>
-        Search on our map
+        Search for stuff on our map
       </div>
   </div>
 

@@ -10,10 +10,6 @@ class SaferConnect < Sinatra::Base
   helpers InstagramConnect::Helpers, FoursquareConnect::Helpers, Helpers
 
   get '/' do
-    if instagram_access_token
-      @instagram_user = InstagramConnect.user(instagram_access_token)
-    end
-
     erb :index
   end
 
@@ -35,6 +31,10 @@ class SaferConnect < Sinatra::Base
 
   get '/map' do
     erb :map
+  end
+
+  get '/photos' do
+    erb :photos
   end
 
   get '/instagram/feed' do

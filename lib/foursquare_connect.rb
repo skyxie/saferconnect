@@ -27,6 +27,7 @@ module FoursquareConnect
     end
     
     def request_profile(token)
+      return if token.nil?
       uri = URI.parse("#{SELF_PROFILE_URI}?oauth_token=#{token}")
       resp = http_request(uri)
       raise resp if resp.code !~ /20[0-9]/
